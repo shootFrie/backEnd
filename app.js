@@ -15,7 +15,33 @@ const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json()) 
+
+// 注册处理错误中间件
+app.use((req, res, next) => {
+	// status=0为成功，status=1为失败，方便处理失败的情况
+	res.cc = (err, status=1) => {
+		res.send({
+			status,
+			// 判断这个error是错误对象还是字符串
+			message: err instanceof Error ? err.message : err
+		})
+	}
+})
+
+// 导入jwt
+const jwtconfig = require('./jwt_config/index')
+const { expressjwt: jwt} = require("express-jwt")
+
+app.use(jwt({
+	secret: jwtconfig.jwtSecretKey, 
+	algorithms: ['HS256'] //使用加密的算法
+}).unless({ //使用中间件去排除不需要在请求端发送token的接口
+	path: [/^\/api\//] // 排除api开头的，注册和登录在调用时不用携带token
+})) // token是在登录之后生成，并且保留到浏览器的 storage 里面
+
+const loginRouter = require('./router/login')
+app.use('/api', loginRouter)
 
 // 绑定和侦听指定的主机和端口
 app.listen(3007, () => {
