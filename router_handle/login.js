@@ -11,8 +11,9 @@ exports.register = (req, res) => {
 	 *  res 是返回给前端的数据，也就是result
 	*/
    const reginfo = req.body;
+   console.log('=====', reginfo)
    // 判断前端传过来的数据有没有空
-   if(reginfo.account || reginfo.password) {
+   if(!reginfo.account || !reginfo.password) {
 	   return res.send({
 		   status: 1,
 		   message: '账号或者密码不能为空'
@@ -41,7 +42,7 @@ exports.register = (req, res) => {
 	   // 注册身份
 	   const identity = '用户'
 	   // 创建时间
-	   const create_time = new Data()
+	   const create_time = new Date()
 	   db.query(sql_insert, {
 		   account: reginfo.account,
 		   password: reginfo.password,
@@ -51,7 +52,8 @@ exports.register = (req, res) => {
 	   }, (err, results) => {
 		   // 第一种情况：插入失败
 		   // 插入失败，数据行数不为1
-		   if(results.effectedRows !== 1) {
+		   console.log("???",results, err)
+		   if(results.affectedRows !== 1) { // affectedRows 表示数据库操作影响的行数
 			   return res.send({
 				   status: 1,
 				   message: "注册账号失败"
@@ -95,7 +97,7 @@ exports.login = (req, res) => {
 		}
 		
 		// 设置token的有效时常， 有效期为7个小时
-		const tokenStr = jwt.sign(user, jwtconfig, jwtSecretKey, {
+		const tokenStr = jwt.sign(user, jwtconfig.jwtSecretKey, {
 			expiresIn: '7h'
 		})
 		res.send({
