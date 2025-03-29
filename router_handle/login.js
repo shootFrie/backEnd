@@ -53,11 +53,13 @@ exports.register = (req, res) => {
 		   // 第一种情况：插入失败
 		   // 插入失败，数据行数不为1
 		   console.log("???",results, err)
-		   if(results.affectedRows !== 1) { // affectedRows 表示数据库操作影响的行数
+		   // 数据库有个id属性没设置自增长的话，这里没加id，results会返回undefined，需要看err
+		   if(!results || results.affectedRows !== 1) { // affectedRows 表示数据库操作影响的行数
 			   return res.send({
 				   status: 1,
 				   message: "注册账号失败"
 			   })
+			   throw err
 		   }
 		   // 第二种情况：注册成功
 		   res.send({
