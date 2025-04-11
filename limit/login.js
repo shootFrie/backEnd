@@ -13,7 +13,7 @@ const account = joi.string().alphanum().min(6).max(12).required()
 /**密码的验证
  * pattern 传入值正则验证
 */ 
-const password = joi.string().pattern(/^(?![0-9]+$)[a-z0-9]{1,50}$/).min(6).max(12).required()
+const password = joi.string().pattern(/^(?![0-9]+$)[a-zA-Z0-9]{1,50}$/).min(6).max(12).required()
 
 
 exports.login_limit = {
